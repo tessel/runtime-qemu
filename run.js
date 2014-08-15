@@ -12,7 +12,7 @@ function collect (fn) {
 
 process.env.STELLARIS_FLASH = 1024
 process.env.STELLARIS_SRAM = 1024
-var ret = spawn('qemu-system-arm', ['-m', '1024K', '-M', 'lm3s6965evb', '--kernel', process.argv[2], '-no-reboot', '-nographic'].concat(process.argv[3] == '-d' ? ['-s', '-S'] : []));
+var ret = spawn('qemu-system-arm', ['-m', '1024K', '-M', 'lm3s6965evb', '--kernel', process.argv[2], '-no-reboot', '-nographic'].concat(process.argv[3] == '-d' ? ['-s', '-S', '-d', 'cpu,exec,in_asm'] : []));
 
 ret.on('error', function (err) {
 		console.error(err);
