@@ -6,7 +6,7 @@ Specifically, it uses the lm3s6965evb environment. Because this doesn't have eno
 
 ## instructions
 
-Run `make update` then `make client`.
+Run `make update` then `make client` then `make run` or `make run-debug` (then run `arm-none-eabi-gdb`).
 
 ## license
 

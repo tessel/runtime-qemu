@@ -141,7 +141,7 @@ int main ()
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
   setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
 
-  printf("\n\n--> START.\n");
+  printf("--> START.\n");
 
   tm_fs_root = tm_fs_dir_create_entry();
   tm_fs_file_handle ok;
