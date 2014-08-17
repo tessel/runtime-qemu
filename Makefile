@@ -27,6 +27,9 @@ run:
 run-debug:
 	@ ./run.js ./out/Release/main.bin -d
 
+run-debug-verbose:
+	@ ./run.js ./out/Release/main.bin -d -v
+
 update:
 	git submodule init
 	cd runtime; make update
