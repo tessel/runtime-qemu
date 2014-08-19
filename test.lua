@@ -1,3 +1,3 @@
 return function () 
-	console:log('hi')
+	console:log('hello world! from javascript.')
 end

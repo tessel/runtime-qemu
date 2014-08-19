@@ -94,12 +94,11 @@ tm_log
 
 */
 
-
-
 unsigned char test_lua[] = {
     #include "test.h"
     , 0x00
 };
+
 
 /**
  * Run
@@ -126,7 +125,7 @@ int traceback (lua_State *L)
 
 void lua_interrupt_hook(lua_State* L, lua_Debug *ar)
 {
-    (void) ar;
+  (void) ar;
   traceback(L);
   printf("SIGINT %s\n", lua_tostring(L, -1));
   exit(0);
