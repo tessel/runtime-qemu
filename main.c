@@ -14,6 +14,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <tm.h>
 #include <colony.h>
@@ -81,10 +82,10 @@ uint32_t tm_uptime_micro () { return 0; }
 void tm_log(char level, const char* string, unsigned length) {
     (void) level;
     while (length-- > 0) {
-        putchar(string[0]);
+        write(100, string, 1);
         string++;
     }
-    putchar('\n');
+    write(100, "\n", 1);
 }
 
 /*
@@ -140,25 +141,47 @@ int main ()
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
   setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
 
-  printf("--> START.\n");
-
+  // TODO: load tar ball
+  // tm_fs_file_handle ok;
+  // tm_fs_ent* dir = tm_fs_dir_create_entry();
   tm_fs_root = tm_fs_dir_create_entry();
-  tm_fs_file_handle ok;
-  ret = tm_fs_open(&ok, tm_fs_root, "test.js", TM_CREAT);
-  // printf("open(): %s\n", strerror(-ret));
-  ret = tm_fs_write (&ok, test_lua, strlen((const char *) test_lua));
-  // printf("write(): %s\n", strerror(-ret));
-  ret = tm_fs_close(&ok);
-  // printf("close(): %s\n", strerror(-ret));
+  ret = tm_fs_mount_tar(tm_fs_root, ".", test_lua, sizeof(test_lua));
+  printf("tm_fs_mount_tar(): %d\n", ret);
+
+  // tm_fs_root = tm_fs_dir_create_entry();
+  // tm_fs_file_handle ok;
+  // ret = tm_fs_open(&ok, tm_fs_root, "test.js", TM_CREAT);
+  // // printf("open(): %s\n", strerror(-ret));
+  // ret = tm_fs_write (&ok, test_lua, strlen((const char *) test_lua));
+  // // printf("write(): %s\n", strerror(-ret));
+  // ret = tm_fs_close(&ok);
+  // // printf("close(): %s\n", strerror(-ret));
+
+  // {
+  //   ret = tm_fs_dir_open((tm_fs_dir_t*) tm_fs_root, tm_fs_root, "/suite");
+  //   const char* pathname = 0;
+  //   while (true) {
+  //     ret = tm_fs_dir_read((tm_fs_dir_t*) tm_fs_root, &pathname);
+  //     if (pathname == NULL) {
+  //       break;
+  //     }
+  //     printf("--> %s\n", pathname);
+  //   }
+  //   ret = tm_fs_dir_close((tm_fs_dir_t*) tm_fs_root);
+  // }
 
   colony_runtime_open();
   // tm_eval_lua()
-  const char *argv[3] = {"colony", "test.js", NULL};
+  const char *argv[3] = {"colony", "suite/parse-numbers.js", NULL};
 
   ret = tm_runtime_run(argv[1], argv, 2);
+  
+  tm_logf(10, "\n# terminate.\n\n");
+  return 0;
+  
   colony_runtime_close();
 
-  printf("--> END.\n");
+  tm_logf(10, "\n# terminate.\n\n");
 
   return ret;
 }

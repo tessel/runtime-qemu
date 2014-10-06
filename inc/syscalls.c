@@ -12,14 +12,17 @@ enum {
 #define UART_FR(baseaddr) (*(((unsigned int *)(baseaddr))+6))
 
 int _close(int file) {
+  (void) file;
   return 0;
 }
 
 void _exit(int code) {
+  (void) code;
   while (1) { }
 }
 
 void _kill(int code) {
+  (void) code;
   while (1) { }
 }
 
@@ -28,26 +31,35 @@ int _getpid() {
 }
 
 int _fstat(int file, struct stat *st) {
+  (void) file;
   st->st_mode = S_IFCHR;
   return 0;
 
 }
 
 int _isatty(int file) {
+  (void) file;
   return 1;
 
 }
 
 int _lseek(int file, int ptr, int dir) {
+  (void) file;
+  (void) ptr;
+  (void) dir;
   return 0;
 
 }
 
 int _open(const char *name, int flags, int mode) {
+  (void) name;
+  (void) flags;
+  (void) mode;
     return -1;
 }
 
 int _read(int file, char *ptr, int len) {
+  (void) file;
   int todo;
   if(len == 0)
     return 0;
@@ -65,9 +77,10 @@ int _read(int file, char *ptr, int len) {
 
 int _write(int file, char *ptr, int len) {
   int todo;
+  if (file == 100) {
   for (todo = 0; todo < len; todo++) {
     UART_DR(UART0_ADDR) = *ptr++;
-
+}
 }
   return len;
 
@@ -120,6 +133,7 @@ int _unlink (void)
 
 
 int _times(struct tms *buf) {
+  (void) buf;
     return -1;
 }
 

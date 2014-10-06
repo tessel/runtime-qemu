@@ -10,7 +10,7 @@ function collect (fn) {
 	return stream;
 }
 
-process.env.STELLARIS_FLASH = 1024
+process.env.STELLARIS_FLASH = 8196
 process.env.STELLARIS_SRAM = 8196
 var ret = spawn('qemu-system-arm', ['-M', 'lm3s6965evb', '--kernel', process.argv[2], '-no-reboot', '-nographic'].concat(
 	(process.argv.indexOf('-d') > -1 ? ['-s', '-S'] : []),
@@ -26,7 +26,7 @@ ret.stdout.pipe(process.stdout);
 
 ret.stdout.on('data', function (d) {
 	d = String(d);
-	if (d.indexOf('!EXIT') > -1) {
+	if (d.indexOf('# terminate.') > -1) {
 		spawn('kill', ['-9', ret.pid]).on('exit', function (c) {
 			process.exit(0);
 		})
