@@ -1,6 +1,6 @@
 {
   "variables": {
-    "linker_path": "<(pwd)/inc/lm3s6965.ld",
+    "linker_path": "<(pwd)/inc/lm3s6965.ld"
   },
 
   "includes": [
@@ -25,7 +25,7 @@
       "include_dirs": [
         'runtime/src/',
         'runtime/src/colony/',
-        "<(colony_lua_path)/src",
+        "<(colony_luajit_path)/src",
       ],
       "dependencies": [
         'runtime/libcolony.gyp:libcolony',

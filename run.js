@@ -33,10 +33,16 @@ ret.stdout.on('data', function (d) {
 	}
 })
 
+var input = process.argv.slice(3).filter(function (d) {
+	return d.indexOf('-') != 0;
+});
+
+ret.stdin.write(input.join(' ') + '\n');
+
 if (process.argv[3] != '-d') {
-	ret.stdout.once('data', function () {
-		setTimeout(function () {
-			spawn('kill', ['-9', ret.pid])
-		}, process.argv[3] ? Number(process.argv[3]) : 1000000);
-	})
+	// ret.stdout.once('data', function () {
+	// 	setTimeout(function () {
+	// 		spawn('kill', ['-9', ret.pid])
+	// 	}, process.argv[3] ? Number(process.argv[3]) : 1000000);
+	// })
 }

@@ -134,12 +134,20 @@ void lua_interrupt_hook(lua_State* L, lua_Debug *ar)
 
 void hw_wait_for_event();
 
+const char m3rig_input[4095] = "\0";
+
 int main ()
 {
   int ret = 0;
 
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
   setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
+
+  char inputpath[255] = {0};
+  int c, idx = 0;
+  while ((c = getchar()) != '\n') {
+    inputpath[idx++] = c;
+  }
 
   // TODO: load tar ball
   // tm_fs_file_handle ok;
@@ -157,29 +165,50 @@ int main ()
   // ret = tm_fs_close(&ok);
   // // printf("close(): %s\n", strerror(-ret));
 
+  colony_runtime_open();
+  const char *argv[3] = {"colony", inputpath, NULL};
+  ret = tm_runtime_run(argv[1], argv, 2);
+  colony_runtime_close();
+
   // {
-  //   ret = tm_fs_dir_open((tm_fs_dir_t*) tm_fs_root, tm_fs_root, "/suite");
-  //   const char* pathname = 0;
+  //   tm_fs_dir_t suite;
+  //   ret = tm_fs_dir_open(&suite, tm_fs_root, "/suite");
+  //   const char* filename = 0;
   //   while (true) {
-  //     ret = tm_fs_dir_read((tm_fs_dir_t*) tm_fs_root, &pathname);
-  //     if (pathname == NULL) {
+  //     ret = tm_fs_dir_read(&suite, &filename);
+  //     if (filename == NULL) {
   //       break;
   //     }
-  //     printf("--> %s\n", pathname);
+
+  //     // get pathname
+  //     char pathname[255] = { 0 };
+  //     strncat(pathname, "suite/", sizeof(pathname));
+  //     strncat(pathname, filename, sizeof(pathname));
+  //     // tm_logf(10, "--> %s", pathname);
+
+  //     tm_logf(11, "@@@ %s @@@", pathname);
+
+  //     colony_runtime_open();
+  //     // tm_eval_lua()
+  //     const char *argv[3] = {"colony", pathname, NULL};
+  //     ret = tm_runtime_run(argv[1], argv, 2);
+  //     colony_runtime_close();
+
+  //     tm_logf(11, "\n\n\n\n");
   //   }
-  //   ret = tm_fs_dir_close((tm_fs_dir_t*) tm_fs_root);
+  //   ret = tm_fs_dir_close(&suite);
   // }
 
-  colony_runtime_open();
-  // tm_eval_lua()
-  const char *argv[3] = {"colony", "suite/parse-numbers.js", NULL};
+  // colony_runtime_open();
+  // // tm_eval_lua()
+  // const char *argv[3] = {"colony", "suite/floatint.js", NULL};
 
-  ret = tm_runtime_run(argv[1], argv, 2);
+  // ret = tm_runtime_run(argv[1], argv, 2);
   
-  tm_logf(10, "\n# terminate.\n\n");
-  return 0;
+  // tm_logf(10, "\n# terminate.\n\n");
+  // return 0;
   
-  colony_runtime_close();
+  // colony_runtime_close();
 
   tm_logf(10, "\n# terminate.\n\n");
 
