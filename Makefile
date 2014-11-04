@@ -27,8 +27,9 @@ client: test.h
 test.h:
 	$(eval TRY := $(shell mktemp -d 2>/dev/null || mktemp -d -t 'makefile'))
 	cp -rf runtime/test $(TRY)
-	# cd runtime/test; find . -name "*array.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
+	# cd runtime/test; find . -name "*472.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
 	# cd runtime/test; find . -name "*tap.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
+	# cd runtime/test; find . -name "*truthy.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
 	cd runtime/test; find . -name "*.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
 	(cd $(TRY)/test; tar cvf - .) | xxd -i > test.h
 

@@ -50,12 +50,6 @@ __attribute__( ( always_inline ) ) static inline void __WFI(void)
   __asm__ volatile ("wfi");
 }
 
-
-void hw_timer_update_interrupt()
-{
-  tm_event_trigger(&tm_timer_event);
-}
-
 void tm_events_lock() { __disable_irq(); }
 void tm_events_unlock() { __enable_irq(); }
 
@@ -77,7 +71,6 @@ double tm_timestamp () { return 0; }
 int tm_timestamp_update (double millis) { (void) millis; return 0; }
 
 void tm_uptime_init () { }
-uint32_t tm_uptime_micro () { return 0; }
 
 void tm_log(char level, const char* string, unsigned length) {
     (void) level;
@@ -136,9 +129,45 @@ void hw_wait_for_event();
 
 const char m3rig_input[4095] = "\0";
 
+#define STMAX 0xFFFFFF
+uint32_t* STCTRL = (void*) 0xE000E000 + 0x10;
+uint32_t* STRELOAD = (void*) 0xE000E000 + 0x14;
+uint32_t* STCURRENT = (void*) 0xE000E000 + 0x18;
+
+uint32_t timercount = 0;
+
+#include "tm.h"
+
+void SysTick_Handler(void) {
+  timercount++;
+}
+
+uint32_t tm_uptime_micro () {
+  return timercount*1e4;
+}
+
+
+void hw_timer_update_interrupt()
+{
+  if (tm_timer_waiting()) {
+    tm_event_trigger(&tm_timer_event);
+  }
+}
+
+void hirestimer_start(void) {
+  *STRELOAD = 0xFFFF;
+  *STCTRL = 0x7;
+}
+
+uint32_t hirestimer_read(uint32_t start) {
+  return (STMAX - *STCURRENT) + STMAX*timercount - start;
+}
+
 int main ()
 {
   int ret = 0;
+
+  hirestimer_start();
 
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
   setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
@@ -210,7 +239,7 @@ int main ()
   
   // colony_runtime_close();
 
-  tm_logf(10, "\n# terminate.\n\n");
+  exit(0);
 
   return ret;
 }

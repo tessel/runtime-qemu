@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var spawn = require('child_process').spawn
+var net = require('net')
 
 function collect (fn) {
 	var stream = new (require('stream').Writable)
@@ -10,39 +11,54 @@ function collect (fn) {
 	return stream;
 }
 
-process.env.STELLARIS_FLASH = 8196
-process.env.STELLARIS_SRAM = 8196
-var ret = spawn('qemu-system-arm', ['-M', 'lm3s6965evb', '--kernel', process.argv[2], '-no-reboot', '-nographic'].concat(
-	(process.argv.indexOf('-d') > -1 ? ['-s', '-S'] : []),
-	(process.argv.indexOf('-v') > -1 ? ['-d', 'cpu,exec,in_asm'] : [])
-));
+var kernel = process.argv[2];
 
-ret.on('error', function (err) {
-		console.error(err);
-		process.exit(1);
-});
-ret.stderr.pipe(process.stderr);
-ret.stdout.pipe(process.stdout);
+function run (kernel)
+{
+  var ret;
 
-ret.stdout.on('data', function (d) {
-	d = String(d);
-	if (d.indexOf('# terminate.') > -1) {
-		spawn('kill', ['-9', ret.pid]).on('exit', function (c) {
-			process.exit(0);
-		})
-	}
-})
+  var server = net.createServer(function (c) {
+    c.once('data', function (code) {
+      setImmediate(function () {
+        ret && spawn('kill', ['-9', ret.pid]).on('exit', function (c) {
+          process.exit(parseInt(String(code)));
+        })
+      });
+    });
+  })
+  server.listen(0, function () {
+    launchqemu(server.address().port);
+  })
 
-var input = process.argv.slice(3).filter(function (d) {
-	return d.indexOf('-') != 0;
-});
+  function launchqemu (port) {
+  	process.env.STELLARIS_FLASH = 8196
+  	process.env.STELLARIS_SRAM = 8196
+  	ret = spawn('qemu-system-arm', [
+  	  '-M', 'lm3s6965evb', '--kernel', kernel,
+  	  '-no-reboot', '-nographic', '-monitor', 'null',
+  	  '-serial', 'stdio',
+      '-serial', 'telnet::' + port,
+  	].concat(
+  		(process.argv.indexOf('-d') > -1 ? ['-s', '-S'] : []),
+  		(process.argv.indexOf('-v') > -1 ? ['-d', 'cpu,exec,in_asm'] : [])
+  	));
 
-ret.stdin.write(input.join(' ') + '\n');
+    ret.on('exit', function (code) {
+      process.exit(code);
+    })
+    ret.on('error', function (err) {
+        console.error(err);
+        process.exit(1);
+    });
+  	ret.stderr.pipe(process.stderr);
+  	ret.stdout.pipe(process.stdout);
 
-if (process.argv[3] != '-d') {
-	// ret.stdout.once('data', function () {
-	// 	setTimeout(function () {
-	// 		spawn('kill', ['-9', ret.pid])
-	// 	}, process.argv[3] ? Number(process.argv[3]) : 1000000);
-	// })
+  	var input = process.argv.slice(3).filter(function (d) {
+  		return d.indexOf('-') != 0;
+  	});
+
+  	ret.stdin.write(input.join(' ') + '\n');
+  }
 }
+
+run(kernel);

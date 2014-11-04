@@ -1,89 +1,125 @@
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/times.h>
 #include <sys/stat.h>
 
 enum {
-  UART_FR_RXFE = 0x10,
-  UART_FR_TXFF = 0x20,
-  UART0_ADDR = 0x4000C000,
+    UART_FR_RXFE = 0x10,
+    UART_FR_TXFF = 0x20,
 
+    UART0_ADDR = 0x4000C000,
+    UART1_ADDR = 0x4000D000,
+    UART2_ADDR = 0x4000E000,
 };
 
-#define UART_DR(baseaddr) (*(unsigned int *)(baseaddr))
-#define UART_FR(baseaddr) (*(((unsigned int *)(baseaddr))+6))
+#define UART_DR(baseaddr) (*(volatile unsigned int*)(baseaddr))
+#define UART_FR(baseaddr) (*(((volatile unsigned int*)(baseaddr)) + 6))
+#define UART_LCR(baseaddr) (*(((volatile unsigned int*)(baseaddr)) + 11))
 
-int _close(int file) {
-  (void) file;
-  return 0;
+int _close(int file)
+{
+    (void)file;
+    return 0;
 }
 
-void _exit(int code) {
-  (void) code;
-  while (1) { }
+void _exit(int code)
+{
+    (void)code;
+    char buf[33];
+    sprintf(buf,"%d\n",code);
+    write(99, buf, strlen(buf));
+    while (1) {
+      continue;
+    }
 }
 
-void _kill(int code) {
-  (void) code;
-  while (1) { }
+void _kill(int code)
+{
+    (void)code;
+    char buf[33];
+    sprintf(buf,"%d\n",code);
+    write(99, buf, strlen(buf));
+    while (1) {
+      continue;
+    }
 }
 
-int _getpid() {
-  return 0;
+int _getpid()
+{
+    return 0;
 }
 
-int _fstat(int file, struct stat *st) {
-  (void) file;
-  st->st_mode = S_IFCHR;
-  return 0;
-
+int _fstat(int file, struct stat* st)
+{
+    (void)file;
+    st->st_mode = S_IFCHR;
+    return 0;
 }
 
-int _isatty(int file) {
-  (void) file;
-  return 1;
-
+int _isatty(int file)
+{
+    (void)file;
+    return 1;
 }
 
-int _lseek(int file, int ptr, int dir) {
-  (void) file;
-  (void) ptr;
-  (void) dir;
-  return 0;
-
+int _lseek(int file, int ptr, int dir)
+{
+    (void)file;
+    (void)ptr;
+    (void)dir;
+    return 0;
 }
 
-int _open(const char *name, int flags, int mode) {
-  (void) name;
-  (void) flags;
-  (void) mode;
+int _open(const char* name, int flags, int mode)
+{
+    (void)name;
+    (void)flags;
+    (void)mode;
     return -1;
 }
 
-int _read(int file, char *ptr, int len) {
-  (void) file;
-  int todo;
-  if(len == 0)
-    return 0;
-  while(UART_FR(UART0_ADDR) & UART_FR_RXFE);
-  *ptr++ = UART_DR(UART0_ADDR);
-  for(todo = 1; todo < len; todo++) {
-    if(UART_FR(UART0_ADDR) & UART_FR_RXFE) { break;  }
+int _read(int file, char* ptr, int len)
+{
+    (void)file;
+    (void)ptr;
+    (void)len;
+
+    UART_LCR(UART0_ADDR) = UART_FR_RXFE;
+
+    int todo;
+    if (len == 0)
+        return 0;
+    volatile int i = 0;
+    while ((UART_FR(UART0_ADDR) & UART_FR_RXFE) && i++ < 4000) {
+      continue;
+    }
     *ptr++ = UART_DR(UART0_ADDR);
-
+    for (todo = 1; todo < len; todo++) {
+        if (UART_FR(UART0_ADDR) & UART_FR_RXFE) {
+            break;
+        }
+        *ptr++ = UART_DR(UART0_ADDR);
+    }
+    return todo;
 }
-  return todo;
 
-}
+int _write(int file, char* ptr, int len)
+{
+    (void)file;
 
+    if (file < 99) {
+      return len;
+    }
 
-int _write(int file, char *ptr, int len) {
-  int todo;
-  if (file == 100) {
-  for (todo = 0; todo < len; todo++) {
-    UART_DR(UART0_ADDR) = *ptr++;
-}
-}
-  return len;
+    long uart = (file == 99 ? UART1_ADDR : UART0_ADDR);
 
+    int todo;
+    for (todo = 0; todo < len; todo++) {
+        UART_DR(uart) = *ptr++;
+    }
+    return len;
 }
 
 // Copyright 2014 Technical Machine, Inc. See the COPYRIGHT
@@ -95,13 +131,13 @@ int _write(int file, char *ptr, int len) {
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-
-extern unsigned char  _heap;  // Start of heap defined in linker
-extern unsigned char  _eheap; // End of heap
+extern unsigned char _heap; // Start of heap defined in linker
+extern unsigned char _eheap; // End of heap
 
 static unsigned char* heap = 0;
 
-unsigned char* _sbrk ( int size ) {
+unsigned char* _sbrk(int size)
+{
     if (heap == 0) {
         heap = (unsigned char*)&_heap;
     }
@@ -119,24 +155,23 @@ unsigned char* _sbrk ( int size ) {
     }
 }
 
-
-
-int _link (void)
+int _link(void)
 {
     return -1;
 }
 
-int _unlink (void)
+int _unlink(void)
 {
     return -1;
 }
 
-
-int _times(struct tms *buf) {
-  (void) buf;
+int _times(struct tms* buf)
+{
+    (void)buf;
     return -1;
 }
 
-int _gettimeofday () {
+int _gettimeofday()
+{
     return -1;
 }
