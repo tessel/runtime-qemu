@@ -46,7 +46,8 @@ run-verbose: client
 	@ ./run.js ./out/Release/main.bin -v
 
 test-all: client
-	@ cd runtime/test; tinytap -e "../../run.js ../../out/Release/main.bin {}" suite/*.js issues/*.js -f "suite/{http*,date,math,net,require,string-decoder,tls,util,zlib}.js"
+	@ cd runtime/test; tinytap -p4 -e "../../run.js ../../out/Release/main.bin {}" suite/*.js issues/*.js -f "suite/{http*,date,math,net,require,string-decoder,tls,util,zlib}.js"
+	@ killall qemu-system-arm > /dev/null 2>&1 || true
 
 update:
 	git submodule init
