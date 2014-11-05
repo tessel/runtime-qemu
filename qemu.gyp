@@ -23,6 +23,7 @@
         'main.c',
       ],
       "include_dirs": [
+        'cmsis_lm3s/',
         'runtime/src/',
         'runtime/src/colony/',
         "<(colony_luajit_path)/src",

@@ -91,8 +91,8 @@ int _read(int file, char* ptr, int len)
     int todo;
     if (len == 0)
         return 0;
-    volatile int i = 0;
-    while ((UART_FR(UART0_ADDR) & UART_FR_RXFE) && i++ < 4000) {
+    // volatile int i = 0;
+    while (UART_FR(UART0_ADDR) & UART_FR_RXFE) {
       continue;
     }
     *ptr++ = UART_DR(UART0_ADDR);

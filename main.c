@@ -19,36 +19,9 @@
 #include <tm.h>
 #include <colony.h>
 
-/** \brief  Enable IRQ Interrupts
+#include <lm3s/lm3s_cmsis.h>
+#include <core/core_cm3.h>
 
-  This function enables IRQ interrupts by clearing the I-bit in the CPSR.
-  Can only be executed in Privileged modes.
- */
-__attribute__( ( always_inline ) ) static inline void __enable_irq(void)
-{
-  __asm__ volatile ("cpsie i" : : : "memory");
-}
-
-
-/** \brief  Disable IRQ Interrupts
-
-  This function disables IRQ interrupts by setting the I-bit in the CPSR.
-  Can only be executed in Privileged modes.
- */
-__attribute__( ( always_inline ) ) static inline void __disable_irq(void)
-{
-  __asm__ volatile ("cpsid i" : : : "memory");
-}
-
-/** \brief  Wait For Interrupt
-
-    Wait For Interrupt is a hint instruction that suspends execution
-    until one of a number of events occurs.
- */
-__attribute__( ( always_inline ) ) static inline void __WFI(void)
-{
-  __asm__ volatile ("wfi");
-}
 
 void tm_events_lock() { __disable_irq(); }
 void tm_events_unlock() { __enable_irq(); }

@@ -1,0 +1,74 @@
+<!--
+Configuration file for Code Red project blinky
+
+Copyright (c) 2009 Luminary Micro, Inc.  All rights reserved.
+Software License Agreement
+
+Luminary Micro, Inc. (LMI) is supplying this software for use solely and
+exclusively on LMI's microcontroller products.
+
+The software is owned by LMI and/or its suppliers, and is protected under
+applicable copyright laws.  All rights are reserved.  You may not combine
+this software with "viral" open-source software in order to form a larger
+program.  Any use in violation of the foregoing restrictions may subject
+the user to criminal sanctions under applicable laws, as well as to civil
+liability for the breach of the terms and conditions of this license.
+
+THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
+OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
+LMI SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+
+This is part of revision 32 of the Stellaris CMSIS Package.
+-->
+
+<project chip="LM3S6965"
+         postBuild="arm-none-eabi-objcopy -O binary ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.bin"
+         type="LMI Basic C project"
+         vendor="LMI">
+  <import src=".">
+    <exclude>{(Makefile|codered|ewarm|gcc|rvmdk|sourcerygxx)}</exclude>
+    <exclude>{startup_(ewarm|ewarm4|gcc|rvmdk|sourcerygxx).(c|S)}</exclude>
+    <exclude>{.*\.(ewd|ewp|eww|icf|Opt|sct|Uv2|xcl|xml|ld)}</exclude>
+  </import>
+  <import src="../..">
+    <copy>lm3s/system_lm3s.c</copy>
+    <copy>lm3s/system_lm3s.h</copy>
+    <copy>core/core_cm3.c</copy>
+    <copy>core/core_cm3.h</copy>
+    <copy>lm3s/lm3s_cmsis.h</copy>
+  </import>
+  <import src=".">
+    <include>blinky_codered.ld</include>
+  </import>
+  <requires>
+  </requires>
+  <setting id="assembler.def">
+    <value>codered</value>
+  </setting>
+  <setting id="compiler.def">
+    <value>__CODE_RED</value>
+    <value>codered</value>
+    <value>PART_LM3S6965</value>
+  </setting>
+  <setting id="compiler.opt"
+           buildType="Debug">
+    <value>-O2</value>
+  </setting>
+  <setting id="compiler.opt"
+           buildType="Release">
+    <value>-O2</value>
+  </setting>
+  <setting id="linker.script">
+    <value>../blinky_codered.ld</value>
+  </setting>
+  <setting id="linker.libs">
+    <value>c</value>
+    <value>gcc</value>
+  </setting>
+  <setting id="compiler.inc">
+    <value>${workspace_loc:/}</value>
+    <value>..</value>
+  </setting>
+</project>
