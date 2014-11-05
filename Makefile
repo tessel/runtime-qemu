@@ -45,6 +45,9 @@ run-debug-verbose: client
 run-verbose: client
 	@ ./run.js ./out/Release/main.bin -v
 
+test-all: client
+	@ cd runtime/test; tinytap -e "../../run.js ../../out/Release/main.bin {}" suite/*.js issues/*.js -f "suite/{http*,date,math,net,require,string-decoder,tls,util,zlib}.js"
+
 update:
 	git submodule init
 	cd runtime; make update
