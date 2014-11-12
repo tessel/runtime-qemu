@@ -34,19 +34,19 @@ test.h:
 	(cd $(TRY)/test; tar cvf - .) | xxd -i > test.h
 
 run: client
-	@ ./run.js ./out/Release/main.bin
+	@ m3rig ./out/Release/main.bin
 
 run-debug: client
-	@ ./run.js ./out/Release/main.bin -d
+	@ m3rig ./out/Release/main.bin -d
 
 run-debug-verbose: client
-	@ ./run.js ./out/Release/main.bin -d -v
+	@ m3rig ./out/Release/main.bin -d -v
 
 run-verbose: client
-	@ ./run.js ./out/Release/main.bin -v
+	@ m3rig ./out/Release/main.bin -v
 
 test-all: client
-	@ cd runtime/test; tinytap -p4 -e "../../run.js ../../out/Release/main.bin {}" suite/*.js issues/*.js -f "suite/{http*,date,math,net,require,string-decoder,tls,util,zlib}.js"
+	@ cd runtime/test; tinytap -p4 -e "m3rig ../../out/Release/main.bin {}" suite/*.js issues/*.js -f "suite/{http*,date,dgram,math,net,require,string-decoder,tls,util,zlib}.js"
 	@ killall qemu-system-arm > /dev/null 2>&1 || true
 
 update:

@@ -1,6 +1,6 @@
 {
   "variables": {
-    "linker_path": "<(pwd)/inc/lm3s6965.ld"
+    "linker_path": "<(pwd)/m3rig/src/lm3s6965.ld"
   },
 
   "includes": [
@@ -17,13 +17,16 @@
         '-T', '<(linker_path)', '-mthumb', '-gdwarf-2', '-ggdb', '-fno-inline-small-functions', '-march=armv7-m', '-msoft-float', '-mfix-cortex-m3-ldrd',
       ],
       "sources": [
-        'inc/startup_lpc1800.s',
-        'inc/startup.c',
-        'inc/syscalls.c',
+        'm3rig/src/startup_lpc1800.s',
+        'm3rig/src/startup.c',
+        'm3rig/src/syscalls.c',
+        'm3rig/src/m3rig.c',
+        'tm_m3rig.c',
         'main.c',
       ],
       "include_dirs": [
-        'cmsis_lm3s/',
+        'm3rig/src/',
+        'm3rig/cmsis_lm3s/',
         'runtime/src/',
         'runtime/src/colony/',
         "<(colony_luajit_path)/src",
