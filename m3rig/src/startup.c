@@ -19,9 +19,13 @@ extern unsigned _data;
 extern unsigned _edata;
 extern unsigned _data_loadaddr;
 
-void main(unsigned r0);
+int main(int argc, char* argv[]);
+void exit (int status);
+int getchar ( void );
 
 void _reset_handler(unsigned r0) {
+	(void) r0;
+	
 	// Zero .bss
 	unsigned* p = &_bss;
 	while (p < &_ebss) {
@@ -46,7 +50,14 @@ void _reset_handler(unsigned r0) {
 		}
 	}
 
-	main(r0);
+	char inputpath[255] = {0};
+	int c;
+	unsigned idx = 0;
+	while ((c = getchar()) != '\n' && idx < sizeof(inputpath) - 1) {
+		inputpath[idx++] = c;
+	}
 
-	while(1) {};
+	char *argv = inputpath;
+
+	exit(main(1, &argv));
 }

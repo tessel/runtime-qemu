@@ -21,24 +21,21 @@
 #include <luajit.h>
 
 unsigned char test_lua[] = {
-    #include "test.h"
+    #include "./tests.h"
     , 0x00
 };
 
-int main ()
+int main (int argc, char* argv[])
 {
+  (void) argc;
+  const char* inputpath = argv[0];
+
   int ret = 0;
 
   hirestimer_start();
 
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
   setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
-
-  char inputpath[255] = {0};
-  int c, idx = 0;
-  while ((c = getchar()) != '\n') {
-    inputpath[idx++] = c;
-  }
 
   // TODO: load tar ball
   // tm_fs_file_handle ok;
@@ -57,8 +54,8 @@ int main ()
   // // printf("close(): %s\n", strerror(-ret));
 
   colony_runtime_open();
-  const char *argv[3] = {"colony", inputpath, NULL};
-  ret = tm_runtime_run(argv[1], argv, 2);
+  const char *argv2[3] = {"colony", inputpath, NULL};
+  ret = tm_runtime_run(argv[1], argv2, 2);
   colony_runtime_close();
 
   // {
@@ -100,8 +97,6 @@ int main ()
   // return 0;
   
   // colony_runtime_close();
-
-  exit(0);
 
   return ret;
 }

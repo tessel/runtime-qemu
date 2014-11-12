@@ -21,8 +21,8 @@
         'm3rig/src/startup.c',
         'm3rig/src/syscalls.c',
         'm3rig/src/m3rig.c',
-        'tm_m3rig.c',
-        'main.c',
+        'src/tm_m3rig.c',
+        'src/main.c',
       ],
       "include_dirs": [
         'm3rig/src/',
@@ -30,6 +30,7 @@
         'runtime/src/',
         'runtime/src/colony/',
         "<(colony_luajit_path)/src",
+        'src/',
       ],
       "dependencies": [
         'runtime/libcolony.gyp:libcolony',

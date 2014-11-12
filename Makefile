@@ -19,19 +19,19 @@ clean:
 	rm test.h
 	cd runtime; make clean
 
-client: test.h
+client: src/tests.h
 	touch runtime/deps/colony-luajit/Makefile
 	$(call compile, qemu.gyp)
 	arm-none-eabi-objcopy -O binary out/Release/main out/Release/main.bin
 
-test.h:
+src/tests.h:
 	$(eval TRY := $(shell mktemp -d 2>/dev/null || mktemp -d -t 'makefile'))
 	cp -rf runtime/test $(TRY)
 	# cd runtime/test; find . -name "*472.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
 	# cd runtime/test; find . -name "*tap.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
 	# cd runtime/test; find . -name "*truthy.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
 	cd runtime/test; find . -name "*.js" -exec bash -c 'colony-compiler "{}" > "$(TRY)/test/{}"' \;
-	(cd $(TRY)/test; tar cvf - .) | xxd -i > test.h
+	(cd $(TRY)/test; tar cvf - .) | xxd -i > src/tests.h
 
 run: client
 	@ m3rig ./out/Release/main.bin
